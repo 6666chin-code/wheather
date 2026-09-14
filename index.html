@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f6f3ee">
+<title>我的天气 · 生活与关系</title>
+<style>
+:root{--bg:#f6f3ee;--card:#fff;--text:#222;--muted:#777;--line:#e7e1da;--soft:#efebe6;--accent:#2d2925}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text)}
+.wrap{max-width:760px;margin:auto;padding:18px 16px 90px} h1{margin:4px 0 6px;font-size:28px}.sub{font-size:14px;line-height:1.65;color:var(--muted);margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+.title{font-weight:700;display:block;margin-bottom:9px}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px}
+textarea,input[type=date]{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;background:#fff}
+textarea{min-height:84px;resize:vertical}.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.scale input,.seg input{display:none}
+.scale label,.seg label{border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;font-size:12px;background:#fff}
+.scale input:checked+label,.seg input:checked+label{background:var(--accent);color:#fff;border-color:var(--accent)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.checkgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.checkgrid label{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:11px;font-size:14px;background:#fff}
+.checkgrid input{width:18px;height:18px;accent-color:var(--accent)}
+@media(max-width:520px){.checkgrid{grid-template-columns:1fr}}.btn{border:0;border-radius:14px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer}
+.primary{width:100%;background:var(--accent);color:#fff}.secondary{background:var(--soft)}.danger{background:#f4e4e4;color:#8c3c3c}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.tab{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;font-size:14px}.tab.active{background:var(--accent);color:#fff}
+.hidden{display:none}.sectionhead{font-size:13px;letter-spacing:.08em;color:var(--muted);margin:22px 4px 4px;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:var(--soft);border-radius:14px;padding:14px}.stat b{font-size:23px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.entry{padding:12px 0;border-top:1px solid var(--line)}.entry:first-child{border-top:0}.badge{display:inline-block;background:var(--soft);border-radius:999px;padding:4px 8px;font-size:12px;margin:3px 3px 3px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}.footer{position:fixed;bottom:0;left:0;right:0;background:rgba(246,243,238,.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));font-size:12px;color:var(--muted);text-align:center}
+canvas{width:100%;height:230px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>我的天气</h1>
+<div class="sub">先记录<strong>我今天怎么生活</strong>，再记录关系。重点不是“他今天爱不爱我”，而是：我的生活有没有重新变得有兴趣、有连接、有自己。</div>
+
+<div class="tabs">
+<div class="tab active" data-tab="today">今天的我</div>
+<div class="tab" data-tab="trend">趋势</div>
+<div class="tab" data-tab="history">记录</div>
+</div>
+
+<section id="today">
+<div class="card"><label class="title">日期</label><input id="date" type="date"></div>
+
+<div class="sectionhead">我的生活</div>
+
+<div class="card">
+<label class="title">今天我把时间花在了哪里？</label>
+<textarea id="dayLife" placeholder="工作、朋友、吃饭、运动、骑车、读书、逛街、发呆、睡觉……"></textarea>
+</div>
+
+<div class="card">
+<label class="title">今天有什么让我开心 / 好奇 / 有兴趣？</label>
+<textarea id="joy" placeholder="哪怕很小：一杯好喝的咖啡、路上的风、工作完成、一本书、朋友一句话。"></textarea>
+</div>
+
+<div class="card">
+<label class="title">今天我和世界的连接感</label>
+<div class="scale">
+<input id="w1" name="world" type="radio" value="1"><label for="w1">1<br>很封闭</label>
+<input id="w2" name="world" type="radio" value="2"><label for="w2">2</label>
+<input id="w3" name="world" type="radio" value="3"><label for="w3">3</label>
+<input id="w4" name="world" type="radio" value="4"><label for="w4">4</label>
+<input id="w5" name="world" type="radio" value="5"><label for="w5">5<br>很有连接</label>
+</div>
+<div class="hint">朋友、工作、兴趣、城市、自然、阅读、运动，都算。</div>
+</div>
+
+<div class="card">
+<label class="title">今天身体状态</label>
+<div class="scale">
+<input id="b1" name="body" type="radio" value="1"><label for="b1">1<br>很差</label>
+<input id="b2" name="body" type="radio" value="2"><label for="b2">2</label>
+<input id="b3" name="body" type="radio" value="3"><label for="b3">3</label>
+<input id="b4" name="body" type="radio" value="4"><label for="b4">4</label>
+<input id="b5" name="body" type="radio" value="5"><label for="b5">5<br>很好</label>
+</div>
+</div>
+
+<div class="card">
+<label class="title">今天整体心情</label>
+<div class="scale">
+<input id="m1" name="mood" type="radio" value="1"><label for="m1">1<br>很低</label>
+<input id="m2" name="mood" type="radio" value="2"><label for="m2">2</label>
+<input id="m3" name="mood" type="radio" value="3"><label for="m3">3</label>
+<input id="m4" name="mood" type="radio" value="4"><label for="m4">4</label>
+<input id="m5" name="mood" type="radio" value="5"><label for="m5">5<br>很好</label>
+</div>
+</div>
+
+<div class="card">
+<label class="title">今天有没有做一件“只是为了自己”的事？</label>
+<div class="seg">
+<input id="fm0" name="forMe" type="radio" value="0"><label for="fm0">没有</label>
+<input id="fm1" name="forMe" type="radio" value="1"><label for="fm1">有一点</label>
+<input id="fm2" name="forMe" type="radio" value="2"><label for="fm2">有，很明确</label>
+</div>
+<textarea id="forMeNote" placeholder="例：去看展、练车、读20页书、散步、做喜欢的饭。"></textarea>
+</div>
+
+<div class="card">
+<label class="title">今天“关系”占据了我多少注意力？</label>
+<div class="scale">
+<input id="r1" name="relationShare" type="radio" value="1"><label for="r1">1<br>很少</label>
+<input id="r2" name="relationShare" type="radio" value="2"><label for="r2">2</label>
+<input id="r3" name="relationShare" type="radio" value="3"><label for="r3">3</label>
+<input id="r4" name="relationShare" type="radio" value="4"><label for="r4">4</label>
+<input id="r5" name="relationShare" type="radio" value="5"><label for="r5">5<br>几乎整天</label>
+</div>
+</div>
+
+<div class="sectionhead">我和他的关系 · 今天发生了什么</div>
+
+<div class="card">
+<label class="title">今天的连接</label>
+<div class="hint" style="margin-bottom:10px">只记录事实，不判断好坏。没发生就不勾。</div>
+<div class="checkgrid">
+<label><input type="checkbox" id="hisInitiative"> 他主动联系我</label>
+<label><input type="checkbox" id="hisCall"> 他给我打电话</label>
+<label><input type="checkbox" id="hisHome"> 他来我家</label>
+<label><input type="checkbox" id="hisMiss"> 他说想我</label>
+<label><input type="checkbox" id="hisFuturePlan"> 他主动安排未来的见面 / 约会</label>
+<label><input type="checkbox" id="myInitiative"> 我主动联系他</label>
+<label><input type="checkbox" id="myCall"> 我给他打电话</label>
+<label><input type="checkbox" id="myMiss"> 我说想他</label>
+<label><input type="checkbox" id="met"> 我们见面了</label>
+<label><input type="checkbox" id="sex"> 我们有性生活</label>
+</div>
+</div>
+
+<div class="sectionhead">我和他的关系 · 我的感受</div>
+
+<div class="card">
+<label class="title">和他互动后，我是更充电还是更耗尽？</label>
+<div class="scale">
+<input id="a1" name="afterContact" type="radio" value="1"><label for="a1">1<br>更耗尽</label>
+<input id="a2" name="afterContact" type="radio" value="2"><label for="a2">2</label>
+<input id="a3" name="afterContact" type="radio" value="3"><label for="a3">3</label>
+<input id="a4" name="afterContact" type="radio" value="4"><label for="a4">4</label>
+<input id="a5" name="afterContact" type="radio" value="5"><label for="a5">5<br>更充电</label>
+</div>
+<div class="hint">今天没互动可以不填。</div>
+</div>
+
+<div class="card">
+<label class="title">今天有“伴侣在这里”的感觉吗？</label>
+<div class="scale">
+<input id="p1" name="presence" type="radio" value="1"><label for="p1">1<br>没有</label>
+<input id="p2" name="presence" type="radio" value="2"><label for="p2">2</label>
+<input id="p3" name="presence" type="radio" value="3"><label for="p3">3</label>
+<input id="p4" name="presence" type="radio" value="4"><label for="p4">4</label>
+<input id="p5" name="presence" type="radio" value="5"><label for="p5">5<br>很有</label>
+</div>
+</div>
+
+<div class="card">
+<label class="title">今天在关系里孤单吗？</label>
+<div class="scale">
+<input id="l1" name="lonely" type="radio" value="1"><label for="l1">1<br>不孤单</label>
+<input id="l2" name="lonely" type="radio" value="2"><label for="l2">2</label>
+<input id="l3" name="lonely" type="radio" value="3"><label for="l3">3</label>
+<input id="l4" name="lonely" type="radio" value="4"><label for="l4">4</label>
+<input id="l5" name="lonely" type="radio" value="5"><label for="l5">5<br>很孤单</label>
+</div>
+</div>
+
+<div class="card">
+<label class="title">今天有没有为了“轻松”而压住真实需求？</label>
+<div class="scale">
+<input id="s1" name="suppression" type="radio" value="1"><label for="s1">1<br>没有</label>
+<input id="s2" name="suppression" type="radio" value="2"><label for="s2">2</label>
+<input id="s3" name="suppression" type="radio" value="3"><label for="s3">3</label>
+<input id="s4" name="suppression" type="radio" value="4"><label for="s4">4</label>
+<input id="s5" name="suppression" type="radio" value="5"><label for="s5">5<br>很多</label>
+</div>
+</div>
+
+<div class="card">
+<label class="title">今天表达需求的方式</label>
+<div class="seg">
+<input id="n0" name="needStyle" type="radio" value="none"><label for="n0">没需要</label>
+<input id="n1" name="needStyle" type="radio" value="direct"><label for="n1">直接表达</label>
+<input id="n2" name="needStyle" type="radio" value="test"><label for="n2">测试/绕弯</label>
+</div>
+</div>
+
+<div class="card">
+<label class="title">今天关系里发生了什么？只写事实</label>
+<textarea id="facts" placeholder="例：他18:30主动问我下班没；晚上没有打电话；我们约了周末吃饭。"></textarea>
+</div>
+
+<div class="card">
+<label class="title">我当时给它赋予了什么意义？</label>
+<textarea id="meaning" placeholder="例：我第一反应是“他没打电话，所以没想我”。"></textarea>
+</div>
+
+<div class="card">
+<label class="title">我真正需要的是什么？</label>
+<textarea id="need" placeholder="例：其实不是要他解决问题，只是想听一会儿他的声音。"></textarea>
+</div>
+
+<div class="sectionhead">收尾</div>
+
+<div class="card">
+<label class="title">今天值得保留的三个小东西</label>
+<textarea id="good" placeholder="可以来自任何地方，不一定和他有关。"></textarea>
+</div>
+
+<div class="card">
+<label class="title">一句话总结今天</label>
+<textarea id="summary" placeholder="例：今天我有点想他，但也认真过了自己的生活。"></textarea>
+</div>
+
+<button class="btn primary" id="save">保存今天</button>
+</section>
+
+<section id="trend" class="hidden">
+<div class="card">
+<label class="title">最近 7 天</label>
+<div class="grid">
+<div class="stat"><b id="avgMood">—</b><span>整体心情</span></div>
+<div class="stat"><b id="avgWorld">—</b><span>世界连接感</span></div>
+<div class="stat"><b id="avgBody">—</b><span>身体状态</span></div>
+<div class="stat"><b id="avgRelationShare">—</b><span>关系占据度</span></div>
+<div class="stat"><b id="avgPresence">—</b><span>伴侣在场感</span></div>
+<div class="stat"><b id="avgLonely">—</b><span>关系孤单感</span></div>
+<div class="stat"><b id="avgSuppression">—</b><span>压抑需求</span></div>
+<div class="stat"><b id="avgAfter">—</b><span>互动后充电感</span></div>
+</div>
+</div>
+<div class="card">
+<label class="title">最近 7 天 · 我们实际发生的连接</label>
+<div class="grid">
+<div class="stat"><b id="cntHisInitiative">—</b><span>他主动联系</span></div>
+<div class="stat"><b id="cntHisCall">—</b><span>他给我电话</span></div>
+<div class="stat"><b id="cntHisHome">—</b><span>他来我家</span></div>
+<div class="stat"><b id="cntHisMiss">—</b><span>他说想我</span></div>
+<div class="stat"><b id="cntHisFuturePlan">—</b><span>他主动安排未来约会/见面</span></div>
+<div class="stat"><b id="cntMyInitiative">—</b><span>我主动联系</span></div>
+<div class="stat"><b id="cntMyCall">—</b><span>我给他电话</span></div>
+<div class="stat"><b id="cntMyMiss">—</b><span>我说想他</span></div>
+<div class="stat"><b id="cntMet">—</b><span>见面</span></div>
+<div class="stat"><b id="cntSex">—</b><span>性生活</span></div>
+</div>
+<div class="hint">这里显示最近7天“发生过的天数”。例如电话 3 = 7天里有3天他给你打过电话。</div>
+</div>
+<div class="card">
+<label class="title">14 天趋势</label>
+<canvas id="chart" width="700" height="260"></canvas>
+<div class="hint">趋势里优先看“整体心情、世界连接感、关系占据度、孤单感”。不要用一天的分数判关系。</div>
+</div>
+<div class="card">
+<label class="title">两周后真正要问自己的问题</label>
+<div class="hint" style="font-size:13px;line-height:1.8">
+① 除了关系，我的生活有没有重新长回来？<br>
+② 当关系占据度下降时，我是不是反而更快乐？<br>
+③ 我不测试、不追问意义以后，关系有没有更轻松？<br>
+④ 即使没有吵架，我在关系里仍然会孤单吗？<br>
+⑤ 我是在享受真实存在的他，还是在等待他变成另一个人？
+</div>
+</div>
+</section>
+
+<section id="history" class="hidden">
+<div class="card"><label class="title">历史记录</label><div id="historyList"></div></div>
+<div class="card">
+<div class="row">
+<button class="btn secondary" id="exportJson">导出 JSON</button>
+<button class="btn secondary" id="exportCsv">导出 CSV</button>
+<button class="btn danger" id="clear">清空全部</button>
+</div>
+<div class="hint">数据只保存在当前浏览器本机。建议每几天导出一次 JSON 备份。</div>
+</div>
+</section>
+</div>
+
+<div class="footer">先记录生活，再记录关系。关系只是今天的一部分。</div>
+
+<script>
+const KEY='my_weather_v4';
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+$('date').value=today();
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}};
+const saveAll=d=>localStorage.setItem(KEY,JSON.stringify(d));
+const rv=n=>{const x=document.querySelector(`input[name="${n}"]:checked`);return x?x.value:''};
+const num=v=>v===''?null:Number(v);
+function setr(n,v){if(v===null||v===undefined||v==='')return;const x=document.querySelector(`input[name="${n}"][value="${v}"]`);if(x)x.checked=true}
+function gather(){return{
+date:$('date').value, dayLife:$('dayLife').value.trim(), joy:$('joy').value.trim(),
+world:num(rv('world')), body:num(rv('body')), mood:num(rv('mood')), forMe:num(rv('forMe')),
+forMeNote:$('forMeNote').value.trim(), relationShare:num(rv('relationShare')),
+hisInitiative:$('hisInitiative').checked, hisCall:$('hisCall').checked, hisHome:$('hisHome').checked,
+hisMiss:$('hisMiss').checked, hisFuturePlan:$('hisFuturePlan').checked, myInitiative:$('myInitiative').checked, myCall:$('myCall').checked,
+myMiss:$('myMiss').checked, met:$('met').checked, sex:$('sex').checked,
+afterContact:num(rv('afterContact')), presence:num(rv('presence')), lonely:num(rv('lonely')),
+suppression:num(rv('suppression')), needStyle:rv('needStyle'),
+facts:$('facts').value.trim(), meaning:$('meaning').value.trim(), need:$('need').value.trim(),
+good:$('good').value.trim(), summary:$('summary').value.trim(), savedAt:new Date().toISOString()
+}}
+function fill(e){
+['hisInitiative','hisCall','hisHome','hisMiss','hisFuturePlan','myInitiative','myCall','myMiss','met','sex'].forEach(k=>{if($(k))$(k).checked=!!e[k]});
+['world','body','mood','forMe','relationShare','afterContact','presence','lonely','suppression','needStyle'].forEach(k=>setr(k,e[k]));
+['dayLife','joy','forMeNote','facts','meaning','need','good','summary'].forEach(k=>$(k).value=e[k]||'');
+$('date').value=e.date||today();
+}
+function clearForm(){document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(x=>x.checked=false);['dayLife','joy','forMeNote','facts','meaning','need','good','summary'].forEach(k=>$(k).value='')}
+$('date').addEventListener('change',()=>{clearForm();const e=load().find(x=>x.date===$('date').value);if(e)fill(e)});
+$('save').onclick=()=>{const e=gather();let d=load();const i=d.findIndex(x=>x.date===e.date);if(i>=0)d[i]=e;else d.push(e);d.sort((a,b)=>a.date.localeCompare(b.date));saveAll(d);alert('已保存今天')};
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
+['today','trend','history'].forEach(id=>$(id).classList.add('hidden'));$(t.dataset.tab).classList.remove('hidden');
+if(t.dataset.tab==='trend')renderTrend(); if(t.dataset.tab==='history')renderHistory();
+});
+
+function avg(arr,k){const v=arr.map(x=>x[k]).filter(x=>typeof x==='number'&&!isNaN(x));return v.length?(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1):'—'}
+function renderTrend(){
+const d=load().sort((a,b)=>a.date.localeCompare(b.date)),w=d.slice(-7);
+$('avgMood').textContent=avg(w,'mood');$('avgWorld').textContent=avg(w,'world');$('avgBody').textContent=avg(w,'body');
+$('avgRelationShare').textContent=avg(w,'relationShare');$('avgPresence').textContent=avg(w,'presence');$('avgLonely').textContent=avg(w,'lonely');
+$('avgSuppression').textContent=avg(w,'suppression');$('avgAfter').textContent=avg(w,'afterContact');
+const count=k=>w.filter(x=>x[k]===true).length;
+$('cntHisInitiative').textContent=count('hisInitiative'); $('cntHisCall').textContent=count('hisCall');
+$('cntHisHome').textContent=count('hisHome'); $('cntHisMiss').textContent=count('hisMiss'); $('cntHisFuturePlan').textContent=count('hisFuturePlan');
+$('cntMyInitiative').textContent=count('myInitiative'); $('cntMyCall').textContent=count('myCall');
+$('cntMyMiss').textContent=count('myMiss'); $('cntMet').textContent=count('met'); $('cntSex').textContent=count('sex');
+draw(d.slice(-14));
+}
+function draw(d){
+const c=$('chart'),ctx=c.getContext('2d'),W=c.width,H=c.height,p={l:42,r:15,t:20,b:35};ctx.clearRect(0,0,W,H);ctx.font='12px sans-serif';
+for(let v=1;v<=5;v++){const y=p.t+(5-v)*(H-p.t-p.b)/4;ctx.strokeStyle='#e7e1da';ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(W-p.r,y);ctx.stroke();ctx.fillStyle='#777';ctx.fillText(v,20,y+4)}
+if(!d.length){ctx.fillText('还没有记录',W/2-30,H/2);return}
+const lines=[['mood',[]],['world',[7,4]],['relationShare',[2,4]],['lonely',[12,4]]];
+lines.forEach(([k,dash])=>{ctx.save();ctx.strokeStyle='#2d2925';ctx.lineWidth=2;ctx.setLineDash(dash);ctx.beginPath();let started=false;
+d.forEach((e,i)=>{if(typeof e[k]!=='number')return;const x=p.l+(d.length===1?0:i*(W-p.l-p.r)/(d.length-1)),y=p.t+(5-e[k])*(H-p.t-p.b)/4;if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)});ctx.stroke();ctx.restore()});
+d.forEach((e,i)=>{if(d.length<=7||i%2===0){const x=p.l+(d.length===1?0:i*(W-p.l-p.r)/(d.length-1));ctx.fillStyle='#777';ctx.fillText(e.date.slice(5),x-14,H-12)}});
+}
+function renderHistory(){const el=$('historyList'),d=load().sort((a,b)=>b.date.localeCompare(a.date));
+if(!d.length){el.innerHTML='<div class="hint">还没有记录。</div>';return}
+el.innerHTML=d.map(e=>`<div class="entry"><b>${e.date}</b><div>
+${e.mood!=null?`<span class="badge">心情 ${e.mood}</span>`:''}
+${e.world!=null?`<span class="badge">世界连接 ${e.world}</span>`:''}
+${e.relationShare!=null?`<span class="badge">关系占据 ${e.relationShare}</span>`:''}
+${e.lonely!=null?`<span class="badge">关系孤单 ${e.lonely}</span>`:''}
+${e.hisInitiative?`<span class="badge">他主动</span>`:''}
+${e.hisCall?`<span class="badge">他来电</span>`:''}
+${e.hisHome?`<span class="badge">他来我家</span>`:''}
+${e.hisMiss?`<span class="badge">他说想我</span>`:''}
+${e.hisFuturePlan?`<span class="badge">他安排未来见面</span>`:''}
+${e.myInitiative?`<span class="badge">我主动</span>`:''}
+${e.myCall?`<span class="badge">我去电</span>`:''}
+${e.myMiss?`<span class="badge">我说想他</span>`:''}
+${e.met?`<span class="badge">见面</span>`:''}
+${e.sex?`<span class="badge">性生活</span>`:''}
+</div><div class="hint">${e.summary||e.joy||e.dayLife||''}</div></div>`).join('');
+}
+function dl(name,txt,type){const b=new Blob([txt],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('exportJson').onclick=()=>dl('我的天气_记录.json',JSON.stringify(load(),null,2),'application/json');
+$('exportCsv').onclick=()=>{const d=load(),cols=['date','dayLife','joy','world','body','mood','forMe','forMeNote','relationShare','hisInitiative','hisCall','hisHome','hisMiss','hisFuturePlan','myInitiative','myCall','myMiss','met','sex','afterContact','presence','lonely','suppression','needStyle','facts','meaning','need','good','summary'],esc=s=>`"${String(s??'').replaceAll('"','""')}"`;dl('我的天气_记录.csv','\uFEFF'+[cols.join(','),...d.map(e=>cols.map(k=>esc(e[k])).join(','))].join('\n'),'text/csv;charset=utf-8')};
+$('clear').onclick=()=>{if(confirm('确定清空全部记录？')){localStorage.removeItem(KEY);renderHistory();renderTrend();}}
+const existing=load().find(x=>x.date===today());if(existing)fill(existing);
+</script>
+</body>
+</html>
